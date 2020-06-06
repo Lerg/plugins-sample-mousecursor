@@ -40,8 +40,13 @@ widget.newButton{
 	label = 'Custom image',
 	onRelease = function()
 		if not cursors.image then
+			local filename = 'cursor.png'
+			-- Detect windows.
+			if (system.getInfo('environment') == 'simulator' and (system.getInfo('architectureInfo') == 'x86' or system.getInfo('architectureInfo') == 'x64')) or system.getInfo('platform') == 'win32' then
+				filename = 'cursor.ani'
+			end
 			cursors.image = mousecursor.newCursor{
-				filename = 'cursor.png',
+				filename = filename,
 				x = 32,	y = 32
 			}
 		end
@@ -52,12 +57,12 @@ widget.newButton{
 widget.newButton{
 	x = xr, y = y - 80,
 	width = w, height = h,
-	label = 'Open hand',
+	label = 'Operation not allowed',
 	onRelease = function()
-		if not cursors.openHand then
-			cursors.openHand = mousecursor.newCursor('open hand')
+		if not cursors.operationNotAllowed then
+			cursors.operationNotAllowed = mousecursor.newCursor('operation not allowed')
 		end
-		cursors.openHand:show()
+		cursors.operationNotAllowed:show()
 	end
 }
 
@@ -76,12 +81,12 @@ widget.newButton{
 widget.newButton{
 	x = xr, y = y - 40,
 	width = w, height = h,
-	label = 'Closed hand',
+	label = 'Help',
 	onRelease = function()
-		if not cursors.closedHand then
-			cursors.closedHand = mousecursor.newCursor('closed hand')
+		if not cursors.help then
+			cursors.help = mousecursor.newCursor('help')
 		end
-		cursors.closedHand:show()
+		cursors.help:show()
 	end
 }
 
@@ -144,4 +149,16 @@ mouseYLabel.anchorX = 0
 Runtime:addEventListener('mouse', function(event)
 	mouseXLabel.text = 'X: ' .. event.x
 	mouseYLabel.text = 'Y: ' .. event.y
+end)
+
+local function onSystemEvent( event )
+    print( "System event name and type: " .. event.name, event.type )
+end
+  
+Runtime:addEventListener('system', function(event)
+	if event.type == 'applicationExit' then
+		for k, cursor in pairs(cursors) do
+			cursor:destroy()
+		end
+	end
 end)
